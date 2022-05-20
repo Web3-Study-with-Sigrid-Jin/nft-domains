@@ -186,45 +186,104 @@ const App = () => {
           value: ethers.utils.parseEther(price),
         })
 
-		const receipt = await tx.wait();
+        const receipt = await tx.wait()
 
-		// 값이 1이면 receipt의 status가 통과된 것임
-		if (receipt.status === 1) {
-			console.log("도메인 생성됨! 트젝 확인하셈! https://rinkeby.etherscan.io/tx/"+tx.hash);
-			
-			// 도메인 레코드를 세팅한다.
-			tx = await contract.setRecord(domain, record);
-			await tx.wait();
-	
-			console.log("레코드 세팅됨! 트젝 확인하셈! https://rinkeby.etherscan.io/tx/"+tx.hash);
-			
-			// 2초 뒤에 fetchMints를 실행한다.
-			setTimeout(() => {
-			  fetchMints();
-			}, 2000);
-	
-			setRecord('');
-			setDomain('');
-		  } else {
-			alert("문제가 있다! 오류다!");
-		  }
+        // 값이 1이면 receipt의 status가 통과된 것임
+        if (receipt.status === 1) {
+          console.log(
+            '도메인 생성됨! 트젝 확인하셈! https://rinkeby.etherscan.io/tx/' +
+              tx.hash,
+          )
+
+          // 도메인 레코드를 세팅한다.
+          tx = await contract.setRecord(domain, record)
+          await tx.wait()
+
+          console.log(
+            '레코드 세팅됨! 트젝 확인하셈! https://rinkeby.etherscan.io/tx/' +
+              tx.hash,
+          )
+
+          // 2초 뒤에 fetchMints를 실행한다.
+          setTimeout(() => {
+            fetchMints()
+          }, 2000)
+
+          setRecord('')
+          setDomain('')
+        } else {
+          alert('문제가 있다! 오류다!')
+        }
       }
     } catch (error) {
       console.log(error)
     }
   }
 
+  // Minting된 NFT 도메인을 렌더링한다
+  const renderMints = () => {
+    if (currentAccount && mints.length > 0) {
+      return (
+        <div className="mint-container">
+          <p className="subtitle"> Recently minted domains!</p>
+          <div className="mint-list">
+            {mints.map((mint, index) => {
+              return (
+                <div className="mint-item" key={index}>
+                  <div className="mint-row">
+                    <a
+                      className="link"
+                      href={`https://testnets.opensea.io/assets/rinkeby/${CONTRACT_ADDRESS}/${mint.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <p className="underlined">
+                        {' '}
+                        {mint.name}
+                        {tld}{' '}
+                      </p>
+                    </a>
+                    {/* 도메인 주인이라면 mint 버튼이 보이게 코딩함 */}
+                    {mint.owner.toLowerCase() ===
+                    currentAccount.toLowerCase() ? (
+                      <button
+                        className="edit-button"
+                        onClick={() => editRecord(mint.name)}
+                      >
+                        <img
+                          className="edit-icon"
+                          src="https://img.icons8.com/metro/26/000000/pencil.png"
+                          alt="Edit button"
+                        />
+                      </button>
+                    ) : null}
+                  </div>
+                  <p> {mint.record} </p>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )
+    }
+  }
+
+  // edit 모드가 가능하게 해줌
+  const editRecord = (name) => {
+    console.log('Editing record for', name)
+    setEditing(true)
+    setDomain(name)
+  }
+
   const switchNetwork = async () => {
     if (window.ethereum) {
       try {
-        // Try to switch to the Mumbai testnet
         await window.ethereum.request({
           method: 'wallet_switchEthereumChain',
-          params: [{ chainId: '0x4' }], // Check networks.js for hexadecimal network ids
+          params: [{ chainId: '0x4' }], // networks.js 확인해서 ID 가져올 것
         })
       } catch (error) {
-        // This error code means that the chain we want has not been added to MetaMask
-        // In this case we ask the user to add it to their MetaMask
+        // 메타마스크에 네트워크 추가가 안되어 있으면 나타나는 오류
         if (error.code === 4902) {
           try {
             await window.ethereum.request({
@@ -250,7 +309,6 @@ const App = () => {
         console.log(error)
       }
     } else {
-      // If window.ethereum is not found then MetaMask is not installed
       alert(
         'MetaMask is not installed. Please install it to use this app: https://metamask.io/download.html',
       )
@@ -355,6 +413,9 @@ const App = () => {
 
         {/* 지금 연결되어 있는 계정이 있다면 renderInputForm을 실행해요 */}
         {currentAccount && renderInputForm()}
+
+		{/* 민팅되어 있는 도메인이 있다면 Render 한다 */}
+		{mints && renderMints()}
 
         <div className="footer-container">
           <img alt="Twitter Logo" className="twitter-logo" src={twitterLogo} />
