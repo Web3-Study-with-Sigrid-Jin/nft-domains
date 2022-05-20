@@ -11,7 +11,7 @@ import ethLogo from './assets/ethlogo.png'
 const TWITTER_HANDLE = 'dsrvlabs'
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`
 const tld = '.ninja'
-const CONTRACT_ADDRESS = '0xD50607C286F35fa7720DaC17De67F822a4176B3D'
+const CONTRACT_ADDRESS = '0x39D3AaE03c7B4Ae7515C951CF3c3CB414Ad34B65'
 
 const App = () => {
   const [network, setNetwork] = useState('')
@@ -62,7 +62,7 @@ const App = () => {
 
   // This will run any time currentAccount or network are changed
   useEffect(() => {
-    if (network === 'Polygon Mumbai Testnet') {
+    if (network === 'Rinkeby') {
       fetchMints()
     }
   }, [currentAccount, network])
