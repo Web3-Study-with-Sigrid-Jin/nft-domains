@@ -3,11 +3,14 @@ import "./styles/App.css";
 import twitterLogo from "./assets/twitter-logo.svg";
 
 // Constants
-const TWITTER_HANDLE = "_buildspace";
+const TWITTER_HANDLE = "dsrvlabs";
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
+const tld = ".ninja";
 
 const App = () => {
   const [currentAccount, setCurrentAccount] = useState("");
+  const [domain, setDomain] = useState('');
+  const [record, setRecord] = useState('');
 
   const connectWallet = async() => {
 	  try {
@@ -70,6 +73,40 @@ const App = () => {
     </div>
   );
 
+  // 도메인 이름과 데이터를 입력하는 폼
+	const renderInputForm = () =>{
+		return (
+			<div className="form-container">
+				<div className="first-row">
+					<input
+						type="text"
+						value={domain}
+						placeholder='domain'
+						onChange={e => setDomain(e.target.value)}
+					/>
+					<p className='tld'> {tld} </p>
+				</div>
+
+				<input
+					type="text"
+					value={record}
+					placeholder='whats ur ninja power'
+					onChange={e => setRecord(e.target.value)}
+				/>
+
+				<div className="button-container">
+					<button className='cta-button mint-button' disabled={null} onClick={null}>
+						Mint
+					</button>  
+					<button className='cta-button mint-button' disabled={null} onClick={null}>
+						Set data
+					</button>  
+				</div>
+
+			</div>
+		);
+	}
+
   // useEffect 라서 페이지가 로딩될 때 아래 함수가 자동으로 실행되어요
   useEffect(() => {
     checkIfWalletIsConnected();
@@ -89,6 +126,9 @@ const App = () => {
 
 		{/* 지금 연결되어 있는 계정이 있다면 Connect Wallet 버튼을 숨겨요 */}
         {!currentAccount && renderNotConnectedContainer()}
+
+		{/* 지금 연결되어 있는 계정이 있다면 renderInputForm을 실행해요 */}
+		{currentAccount && renderInputForm()}
 
         <div className="footer-container">
           <img alt="Twitter Logo" className="twitter-logo" src={twitterLogo} />
