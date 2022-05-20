@@ -9,27 +9,27 @@ const tld = ".ninja";
 
 const App = () => {
   const [currentAccount, setCurrentAccount] = useState("");
-  const [domain, setDomain] = useState('');
-  const [record, setRecord] = useState('');
+  const [domain, setDomain] = useState("");
+  const [record, setRecord] = useState("");
 
-  const connectWallet = async() => {
-	  try {
-		  const { ethereum } = window;
+  const connectWallet = async () => {
+    try {
+      const { ethereum } = window;
 
-		  if (!ethereum) {
-			  alert("메타마스크를 설치하세요.");
-			  return;
-		  }
-		  const accounts = await ethereum.request({
-			  method: "eth_requestAccounts"
-		  })
+      if (!ethereum) {
+        alert("메타마스크를 설치하세요.");
+        return;
+      }
+      const accounts = await ethereum.request({
+        method: "eth_requestAccounts",
+      });
 
-		  console.log("새로운 계정을 가져왔어요. ", accounts[0]);
-		  setCurrentAccount(accounts[0])
-	  } catch (error) {
-		  console.log(error)
-	  }
-	}
+      console.log("새로운 계정을 가져왔어요. ", accounts[0]);
+      setCurrentAccount(accounts[0]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const checkIfWalletIsConnected = async () => {
     // window.ethereum 은 메타마스크를 호출
@@ -42,21 +42,21 @@ const App = () => {
 
     console.log("메타마스크 ethereum object 에요", ethereum);
 
-	// eth_accounts API를 통해 계정을 가져온다
+    // eth_accounts API를 통해 계정을 가져온다
     const accounts = await ethereum.request({
       method: "eth_accounts",
     });
 
-	if (accounts.length !== 0) {
-		// 첫 번째 계정을 가져온다
-		const account = accounts[0];
-		console.log("첫 번째 계정을 찾았어요: ", account)
-		// 첫 번째 계정을 setAccount 한다
-		setCurrentAccount(account);
-		return;
-	}
+    if (accounts.length !== 0) {
+      // 첫 번째 계정을 가져온다
+      const account = accounts[0];
+      console.log("첫 번째 계정을 찾았어요: ", account);
+      // 첫 번째 계정을 setAccount 한다
+      setCurrentAccount(account);
+      return;
+    }
 
-	console.log("계정이 없네요...")
+    console.log("계정이 없네요...");
     return;
   };
 
@@ -67,45 +67,55 @@ const App = () => {
         src="https://media.giphy.com/media/3ohhwytHcusSCXXOUg/giphy.gif"
         alt="Ninja gif"
       />
-      <button onClick={connectWallet} className="cta-button connect-wallet-button">
+      <button
+        onClick={connectWallet}
+        className="cta-button connect-wallet-button"
+      >
         Connect Wallet
       </button>
     </div>
   );
 
   // 도메인 이름과 데이터를 입력하는 폼
-	const renderInputForm = () =>{
-		return (
-			<div className="form-container">
-				<div className="first-row">
-					<input
-						type="text"
-						value={domain}
-						placeholder='domain'
-						onChange={e => setDomain(e.target.value)}
-					/>
-					<p className='tld'> {tld} </p>
-				</div>
+  const renderInputForm = () => {
+    return (
+      <div className="form-container">
+        <div className="first-row">
+          <input
+            type="text"
+            value={domain}
+            placeholder="domain"
+            onChange={(e) => setDomain(e.target.value)}
+          />
+          <p className="tld"> {tld} </p>
+        </div>
 
-				<input
-					type="text"
-					value={record}
-					placeholder='whats ur ninja power'
-					onChange={e => setRecord(e.target.value)}
-				/>
+        <input
+          type="text"
+          value={record}
+          placeholder="whats ur ninja power"
+          onChange={(e) => setRecord(e.target.value)}
+        />
 
-				<div className="button-container">
-					<button className='cta-button mint-button' disabled={null} onClick={null}>
-						Mint
-					</button>  
-					<button className='cta-button mint-button' disabled={null} onClick={null}>
-						Set data
-					</button>  
-				</div>
-
-			</div>
-		);
-	}
+        <div className="button-container">
+          <button
+            className="cta-button mint-button"
+            disabled={null}
+            onClick={null}
+          >
+            Mint
+          </button>
+          <button
+            className="cta-button mint-button"
+            disabled={null}
+            onClick={null}
+          >
+            Set data
+          </button>
+        </div>
+      </div>
+    );
+  };
 
   // useEffect 라서 페이지가 로딩될 때 아래 함수가 자동으로 실행되어요
   useEffect(() => {
@@ -124,11 +134,11 @@ const App = () => {
           </header>
         </div>
 
-		{/* 지금 연결되어 있는 계정이 있다면 Connect Wallet 버튼을 숨겨요 */}
+        {/* 지금 연결되어 있는 계정이 있다면 Connect Wallet 버튼을 숨겨요 */}
         {!currentAccount && renderNotConnectedContainer()}
 
-		{/* 지금 연결되어 있는 계정이 있다면 renderInputForm을 실행해요 */}
-		{currentAccount && renderInputForm()}
+        {/* 지금 연결되어 있는 계정이 있다면 renderInputForm을 실행해요 */}
+        {currentAccount && renderInputForm()}
 
         <div className="footer-container">
           <img alt="Twitter Logo" className="twitter-logo" src={twitterLogo} />
