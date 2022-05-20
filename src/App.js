@@ -11,7 +11,7 @@ import ethLogo from './assets/ethlogo.png'
 const TWITTER_HANDLE = 'dsrvlabs'
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`
 const tld = '.ninja'
-const CONTRACT_ADDRESS = '0x58eA6DFf258248E5B7A6F48bB11c063FA1723DF5'
+const CONTRACT_ADDRESS = '0xD50607C286F35fa7720DaC17De67F822a4176B3D'
 
 const App = () => {
   const [network, setNetwork] = useState('')
