@@ -112,6 +112,47 @@ const App = () => {
     }
   }
 
+  const switchNetwork = async () => {
+	if (window.ethereum) {
+	  try {
+		// Try to switch to the Mumbai testnet
+		await window.ethereum.request({
+		  method: 'wallet_switchEthereumChain',
+		  params: [{ chainId: '0x4' }], // Check networks.js for hexadecimal network ids
+		});
+	  } catch (error) {
+		// This error code means that the chain we want has not been added to MetaMask
+		// In this case we ask the user to add it to their MetaMask
+		if (error.code === 4902) {
+		  try {
+			await window.ethereum.request({
+			  method: 'wallet_addEthereumChain',
+			  params: [
+				{	
+				  chainId: '0x2a',
+				  chainName: 'Ethereum Rinkeby Testnet',
+				  rpcUrls: ['https://ethereum-rinkeby-rpc.allthatnode.com/'],
+				  nativeCurrency: {
+					  name: "Rinkeby Ether",
+					  symbol: "ETH",
+					  decimals: 18
+				  },
+				  blockExplorerUrls: ["https://rinkeby.etherscan.io/"]
+				},
+			  ],
+			});
+		  } catch (error) {
+			console.log(error);
+		  }
+		}
+		console.log(error);
+	  }
+	} else {
+	  // If window.ethereum is not found then MetaMask is not installed
+	  alert('MetaMask is not installed. Please install it to use this app: https://metamask.io/download.html');
+	} 
+  }
+
   // 메타마스크가 연결되어 있지 않을 때 render 하는 container 에요
   const renderNotConnectedContainer = () => (
     <div className="connect-wallet-container">
@@ -130,10 +171,11 @@ const App = () => {
 
   // 도메인 이름과 데이터를 입력하는 폼
   const renderInputForm = () => {
-    if (network !== 'Kovan') {
+    if (network !== 'Rinkeby') {
       return (
         <div className="connect-wallet-container">
-          <p>Please connect to the Kovan Testnet</p>
+          <p>Please connect to the Rinkeby Testnet</p>
+		  <button className='cta-button mint-button' onClick={switchNetwork}>Click here to switch</button>
         </div>
       )
     }
@@ -187,7 +229,7 @@ const App = () => {
               <img
                 alt="Network logo"
                 className="logo"
-                src={network.includes('kovan') ? ethLogo : polygonLogo}
+                src={network.includes('Rinkeby') ? ethLogo : polygonLogo}
               />
               {currentAccount ? (
                 <p>
