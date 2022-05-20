@@ -18,6 +18,85 @@ const App = () => {
   const [currentAccount, setCurrentAccount] = useState('')
   const [domain, setDomain] = useState('')
   const [record, setRecord] = useState('')
+  const [mints, setMints] = useState([])
+  const [editing, setEditing] = useState(false)
+  const [loading, setLoading] = useState(false)
+
+  const fetchMints = async () => {
+    try {
+      const { ethereum } = window
+      if (ethereum) {
+        // You know all this
+        const provider = new ethers.providers.Web3Provider(ethereum)
+        const signer = provider.getSigner()
+        const contract = new ethers.Contract(
+          CONTRACT_ADDRESS,
+          contractAbi.abi,
+          signer,
+        )
+
+        // Get all the domain names from our contract
+        const names = await contract.getAllNames()
+
+        // For each name, get the record and the address
+        const mintRecords = await Promise.all(
+          names.map(async (name) => {
+            const mintRecord = await contract.records(name)
+            const owner = await contract.domains(name)
+            return {
+              id: names.indexOf(name),
+              name: name,
+              record: mintRecord,
+              owner: owner,
+            }
+          }),
+        )
+
+        console.log('MINTS FETCHED ', mintRecords)
+        setMints(mintRecords)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  // This will run any time currentAccount or network are changed
+  useEffect(() => {
+    if (network === 'Polygon Mumbai Testnet') {
+      fetchMints()
+    }
+  }, [currentAccount, network])
+
+  const updateDomain = async () => {
+    if (!record || !domain) {
+      return
+    }
+    setLoading(true)
+    console.log('Updating domain', domain, 'with record', record)
+    try {
+      const { ethereum } = window
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum)
+        const signer = provider.getSigner()
+        const contract = new ethers.Contract(
+          CONTRACT_ADDRESS,
+          contractAbi.abi,
+          signer,
+        )
+
+        let tx = await contract.setRecord(domain, record)
+        await tx.wait()
+        console.log('Record set https://rinkeby.etherscan.io/tx/' + tx.hash)
+
+        fetchMints()
+        setRecord('')
+        setDomain('')
+      }
+    } catch (error) {
+      console.log(error)
+    }
+    setLoading(false)
+  }
 
   const connectWallet = async () => {
     try {
@@ -113,44 +192,46 @@ const App = () => {
   }
 
   const switchNetwork = async () => {
-	if (window.ethereum) {
-	  try {
-		// Try to switch to the Mumbai testnet
-		await window.ethereum.request({
-		  method: 'wallet_switchEthereumChain',
-		  params: [{ chainId: '0x4' }], // Check networks.js for hexadecimal network ids
-		});
-	  } catch (error) {
-		// This error code means that the chain we want has not been added to MetaMask
-		// In this case we ask the user to add it to their MetaMask
-		if (error.code === 4902) {
-		  try {
-			await window.ethereum.request({
-			  method: 'wallet_addEthereumChain',
-			  params: [
-				{	
-				  chainId: '0x2a',
-				  chainName: 'Ethereum Rinkeby Testnet',
-				  rpcUrls: ['https://ethereum-rinkeby-rpc.allthatnode.com/'],
-				  nativeCurrency: {
-					  name: "Rinkeby Ether",
-					  symbol: "ETH",
-					  decimals: 18
-				  },
-				  blockExplorerUrls: ["https://rinkeby.etherscan.io/"]
-				},
-			  ],
-			});
-		  } catch (error) {
-			console.log(error);
-		  }
-		}
-		console.log(error);
-	  }
-	} else {
-	  // If window.ethereum is not found then MetaMask is not installed
-	  alert('MetaMask is not installed. Please install it to use this app: https://metamask.io/download.html');
-	} 
+    if (window.ethereum) {
+      try {
+        // Try to switch to the Mumbai testnet
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: '0x4' }], // Check networks.js for hexadecimal network ids
+        })
+      } catch (error) {
+        // This error code means that the chain we want has not been added to MetaMask
+        // In this case we ask the user to add it to their MetaMask
+        if (error.code === 4902) {
+          try {
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [
+                {
+                  chainId: '0x2a',
+                  chainName: 'Ethereum Rinkeby Testnet',
+                  rpcUrls: ['https://ethereum-rinkeby-rpc.allthatnode.com/'],
+                  nativeCurrency: {
+                    name: 'Rinkeby Ether',
+                    symbol: 'ETH',
+                    decimals: 18,
+                  },
+                  blockExplorerUrls: ['https://rinkeby.etherscan.io/'],
+                },
+              ],
+            })
+          } catch (error) {
+            console.log(error)
+          }
+        }
+        console.log(error)
+      }
+    } else {
+      // If window.ethereum is not found then MetaMask is not installed
+      alert(
+        'MetaMask is not installed. Please install it to use this app: https://metamask.io/download.html',
+      )
+    }
   }
 
   // 메타마스크가 연결되어 있지 않을 때 render 하는 container 에요
@@ -175,7 +256,9 @@ const App = () => {
       return (
         <div className="connect-wallet-container">
           <p>Please connect to the Rinkeby Testnet</p>
-		  <button className='cta-button mint-button' onClick={switchNetwork}>Click here to switch</button>
+          <button className="cta-button mint-button" onClick={switchNetwork}>
+            Click here to switch
+          </button>
         </div>
       )
     }
