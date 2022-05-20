@@ -130,10 +130,10 @@ const App = () => {
 
   // 도메인 이름과 데이터를 입력하는 폼
   const renderInputForm = () => {
-    if (network !== 'Kovan') {
+    if (network !== 'Rinkeby') {
       return (
         <div className="connect-wallet-container">
-          <p>Please connect to the Kovan Testnet</p>
+          <p>Please connect to the Rinkeby Testnet</p>
         </div>
       )
     }
@@ -187,7 +187,7 @@ const App = () => {
               <img
                 alt="Network logo"
                 className="logo"
-                src={network.includes('kovan') ? ethLogo : polygonLogo}
+                src={network.includes('Rinkeby') ? ethLogo : polygonLogo}
               />
               {currentAccount ? (
                 <p>
