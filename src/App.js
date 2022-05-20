@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
 import "./styles/App.css";
 import twitterLogo from "./assets/twitter-logo.svg";
+import { ethers } from "ethers";
+import contractAbi from './utils/Domains.json';
 
 // Constants
 const TWITTER_HANDLE = "dsrvlabs";
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 const tld = ".ninja";
+const CONTRACT_ADDRESS = "0x58eA6DFf258248E5B7A6F48bB11c063FA1723DF5";
 
 const App = () => {
   const [currentAccount, setCurrentAccount] = useState("");
@@ -60,6 +63,36 @@ const App = () => {
     return;
   };
 
+  const mintDomain = async() => {
+	  if (!domain) {
+		  return
+	  }
+	  if (domain.length < 3) {
+		  alert('도메인이 너무 짧은데.. 3글자는 넘겨주세요..')
+		  return
+	  }
+	  const price = domain.length === 3 ? '0.5' 
+	  				: domain.length === 4 ? '0.3'
+	  				: '0.1';
+	  console.log("Minting domain: ", domain, "with price ", price);
+
+	  try {
+		  const { ethereum } = window;
+		  if (ethereum) {
+			  const provider = new ethers.providers.Web3Provider(ethereum);
+			  const signer = provider.getSigner();
+			  const contract = new ethers.Contract(CONTRACT_ADDRESS, contractAbi.abi, signer);
+
+			  console.log('메타마스크 월렛을 띄울 거고, 가스비를 지불할 겁니다')
+			  let tx = await contract.register(domain, {
+				  value: ethers.utils.parseEther(price)
+			  })
+		  }
+	  } catch (error) {
+		  console.log(error);
+	  }
+  }
+
   // 메타마스크가 연결되어 있지 않을 때 render 하는 container 에요
   const renderNotConnectedContainer = () => (
     <div className="connect-wallet-container">
@@ -101,16 +134,9 @@ const App = () => {
           <button
             className="cta-button mint-button"
             disabled={null}
-            onClick={null}
+            onClick={mintDomain}
           >
             Mint
-          </button>
-          <button
-            className="cta-button mint-button"
-            disabled={null}
-            onClick={null}
-          >
-            Set data
           </button>
         </div>
       </div>
