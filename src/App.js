@@ -185,6 +185,29 @@ const App = () => {
         let tx = await contract.register(domain, {
           value: ethers.utils.parseEther(price),
         })
+
+		const receipt = await tx.wait();
+
+		// 값이 1이면 receipt의 status가 통과된 것임
+		if (receipt.status === 1) {
+			console.log("도메인 생성됨! 트젝 확인하셈! https://rinkeby.etherscan.io/tx/"+tx.hash);
+			
+			// 도메인 레코드를 세팅한다.
+			tx = await contract.setRecord(domain, record);
+			await tx.wait();
+	
+			console.log("레코드 세팅됨! 트젝 확인하셈! https://rinkeby.etherscan.io/tx/"+tx.hash);
+			
+			// 2초 뒤에 fetchMints를 실행한다.
+			setTimeout(() => {
+			  fetchMints();
+			}, 2000);
+	
+			setRecord('');
+			setDomain('');
+		  } else {
+			alert("문제가 있다! 오류다!");
+		  }
       }
     } catch (error) {
       console.log(error)
