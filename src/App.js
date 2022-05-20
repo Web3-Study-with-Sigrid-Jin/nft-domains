@@ -346,35 +346,41 @@ const App = () => {
       )
     }
     return (
-      <div className="form-container">
-        <div className="first-row">
-          <input
-            type="text"
-            value={domain}
-            placeholder="domain"
-            onChange={(e) => setDomain(e.target.value)}
-          />
-          <p className="tld"> {tld} </p>
-        </div>
-
-        <input
-          type="text"
-          value={record}
-          placeholder="whats ur ninja power"
-          onChange={(e) => setRecord(e.target.value)}
-        />
-
-        <div className="button-container">
-          <button
-            className="cta-button mint-button"
-            disabled={null}
-            onClick={mintDomain}
-          >
-            Mint
-          </button>
-        </div>
-      </div>
-    )
+		<div className="form-container">
+		  <div className="first-row">
+			<input
+			  type="text"
+			  value={domain}
+			  placeholder='domain'
+			  onChange={e => setDomain(e.target.value)}
+			/>
+			<p className='tld'> {tld} </p>
+		  </div>
+  
+		  <input
+			type="text"
+			value={record}
+			placeholder='whats ur ninja power?'
+			onChange={e => setRecord(e.target.value)}
+		  />
+			{/* editing이 true이면 set Record, cancel 보여준다 */}
+			{editing ? (
+			  <div className="button-container">
+				<button className='cta-button mint-button' disabled={loading} onClick={updateDomain}>
+				  Set record
+				</button>  
+				<button className='cta-button mint-button' onClick={() => {setEditing(false)}}>
+				  Cancel
+				</button>  
+			  </div>
+			) : (
+			  // If editing is not true, the mint button will be returned instead
+			  <button className='cta-button mint-button' disabled={loading} onClick={mintDomain}>
+				Mint
+			  </button>  
+			)}
+		</div>
+	  );
   }
 
   // useEffect 라서 페이지가 로딩될 때 아래 함수가 자동으로 실행되어요
