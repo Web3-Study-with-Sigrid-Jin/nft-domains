@@ -11,7 +11,7 @@ import ethLogo from './assets/ethlogo.png'
 const TWITTER_HANDLE = 'dsrvlabs'
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`
 const tld = '.ninja'
-const CONTRACT_ADDRESS = '0x39D3AaE03c7B4Ae7515C951CF3c3CB414Ad34B65'
+const CONTRACT_ADDRESS = '0x25162e609922b598f96BCB503d5d74bD5c6dAE29'
 
 const App = () => {
   const [network, setNetwork] = useState('')
@@ -37,6 +37,8 @@ const App = () => {
 
         // Get all the domain names from our contract
         const names = await contract.getAllNames()
+
+        console.log('names ', names)
 
         // For each name, get the record and the address
         const mintRecords = await Promise.all(
@@ -414,8 +416,8 @@ const App = () => {
         {/* 지금 연결되어 있는 계정이 있다면 renderInputForm을 실행해요 */}
         {currentAccount && renderInputForm()}
 
-		{/* 민팅되어 있는 도메인이 있다면 Render 한다 */}
-		{mints && renderMints()}
+        {/* 민팅되어 있는 도메인이 있다면 Render 한다 */}
+        {mints && renderMints()}
 
         <div className="footer-container">
           <img alt="Twitter Logo" className="twitter-logo" src={twitterLogo} />
